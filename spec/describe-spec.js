@@ -66,4 +66,46 @@
 
     console.log('Execute order passed');
   })();
+
+  (function testNestedDescribes() {
+    const suite = new SuiteDouble();
+
+    describe(suite, 'Outer', function() {
+      if (suite.contexts.length !== 1)
+        throw new Error('Have not entered outer context properly');
+      if (suite.exitContextCounter !== 0)
+        throw new Error('Exited outer context too early');
+
+      describe(suite, 'Inner 1', function() {
+        if (suite.contexts.length !== 2)
+          throw new Error('Have not entered inner 1 context properly');
+        if (suite.exitContextCounter !== 0)
+          throw new Error('Exited inner context early');
+      });
+
+      if (suite.contexts.length !== 2)
+        throw new Error('Added unknown context');
+      if (suite.exitContextCounter !== 1)
+        throw new Error('Exited outer context too early');
+
+      describe(suite, 'Inner 2', function() {
+        if (suite.contexts.length !== 3)
+          throw new Error('Have not entered inner 2 context properly');
+        if (suite.exitContextCounter !== 1)
+          throw new Error('Exited inner context early');
+      });
+
+      if (suite.contexts.length !== 3)
+        throw new Error('Added unknown context');
+      if (suite.exitContextCounter !== 2)
+        throw new Error('Exited outer context too early');
+    });
+
+    if (suite.contexts.length !== 3)
+      throw new Error('Added unknown context');
+    if (suite.exitContextCounter !== 3)
+      throw new Error('Exited outer context incorrectly');
+
+    console.log('Nested describes passed')
+  })();
 })();
